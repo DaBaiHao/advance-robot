@@ -5,8 +5,8 @@ import tkinter.messagebox as messagebox
 import random
 
 # create an class named Application, hold all Widget
-playerChoiceList = []
-
+playerChoiceList = list()
+computerChoiceList = list()
 
 class Application(Frame):
     # init all app
@@ -39,11 +39,13 @@ class Application(Frame):
     # player choose scissors
     def scissors(self):
         playerChoice = "scissors"
+        playerChoiceList.append('1')
         self.computeWin(playerChoice)
 
     # player choose Paper
     def Paper(self):
         playerChoice = "Paper"
+        playerChoiceList.append('2')
         self.computeWin(playerChoice)
 
 
@@ -54,6 +56,7 @@ class Application(Frame):
 
         # random a number
         computerChoice = random.randint(0, 2)
+        computerChoiceList.append(computerChoice)
 
         # print a number
         if computerChoice == 0 :

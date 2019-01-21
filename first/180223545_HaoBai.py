@@ -1,3 +1,4 @@
+# Name：Hao Bai, ID: 180223545
 # import an GUI package
 from tkinter import *
 
@@ -49,7 +50,9 @@ class Application(Frame):
         self.computeWin(playerChoice)
 
 
-
+    ''' 
+    
+    '''
     def computeWin(self,playerChoice):
         # for computer 0 = rock, 1 = scissors, 2 = Paper
         print("Your choice: " + playerChoice)
@@ -74,6 +77,8 @@ class Application(Frame):
 
         if ((playerChoice == "Rock")and(computerChoice == 2))or((playerChoice == "scissors") and (computerChoice == 0))or((playerChoice == "Paper") and (computerChoice == 1)):
             messagebox.showinfo('Win or Loss', 'Loss')
+
+
 
 app = Application()
 

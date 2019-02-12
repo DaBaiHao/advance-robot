@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String,Float32
-from AR_week5_test.msg import cubic_traj_params,cubic_traj_coeffs
+from AR_week5_test.msg import cubic_traj_params,cubic_traj_coeffs,plot_data
 # from AR_week5_test.srv import *
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,9 +10,6 @@ import std_msgs.msg as std_msgs
 
 
 
-p_traj = std_msgs.Float32MultiArray
-v_traj = std_msgs.Float32MultiArray
-a_traj = std_msgs.Float32MultiArray
 
 def callback(data):
     #rospy.loginfo(rospy.get_caller_id() + 'I heard %.2f', data.t0)
@@ -67,12 +64,12 @@ def listener():
 
 
 def talker(p_traj,v_traj,a_traj,t0,tf):
-    pub = rospy.Publisher('plot', std_msgs.Float32MultiArray, queue_size = 10)
+    pub = rospy.Publisher('plot', plot_data, queue_size = 10)
     rospy.init_node('plot_cubic_traj', anonymous=True)
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(0.1)
     # msg = send
     T = np.arange(t0,tf,0.01)
-
+    
     # for _T,_p_traj in zip(T,p_traj):
     #     _pub = [_T,_p_traj]
     #     pub.publish(_pub)
@@ -81,6 +78,10 @@ def talker(p_traj,v_traj,a_traj,t0,tf):
     p_out = std_msgs.Float32MultiArray()
     p_out.layout = T
     p_out.data = p_traj
+
+    out_msg = plot_data()
+    
+
     
     if(len(p_traj)>2):
         plt.figure(0)
@@ -88,8 +89,16 @@ def talker(p_traj,v_traj,a_traj,t0,tf):
         plt.plot(T,p_traj)
         plt.plot(T,v_traj)
         plt.plot(T,a_traj)
-        # for _i in range(len(p_traj)):
-        pub.publish(p_out)
+
+        out_msg.p_out = p_traj
+        out_msg.a_out = v_traj
+        out_msg.a_out = a_traj
+        for _i in range(len(T)):
+            out_msg.p_out = p_traj[_i]
+            out_msg.a_out = v_traj[_i]
+            out_msg.a_out = a_traj[_i]
+            pub.publish(out_msg)
+        
         
         plt.pause(3)
         plt.close(0)

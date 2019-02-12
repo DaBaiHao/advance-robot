@@ -52,7 +52,7 @@ add_message_files(
    FILES
    cubic_traj_params.msg
    cubic_traj_coeffs.msg
-   #plot_data.msg
+   plot_data.msg
 )
 
 ## Generate services in the 'srv' folder

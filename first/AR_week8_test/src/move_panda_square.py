@@ -2,6 +2,8 @@
 
 import rospy
 from std_msgs.msg import String,Float32
+import time
+
 
 import sys
 import copy
@@ -21,6 +23,16 @@ def callback(data):
     plan, fraction = plan_Cartesian_path(data)
     display_trajectory(plan)
     execute_plan(plan)
+
+
+def plot(x,y,z):
+    pubX = rospy.Publisher('x', Float32, queue_size=1)
+    pubY = rospy.Publisher('Y', Float32, queue_size=1)
+    pubZ = rospy.Publisher('Z', Float32, queue_size=1)
+
+    pubX.publish(x)
+    pubY.publish(y)
+    pubZ.publish(z)
 
     
 def move_2_starting_configuration():
@@ -58,6 +70,11 @@ def plan_Cartesian_path(data):
 
     wpose.position.y -= scale * 0.1  # Third move sideways (y)
     waypoints.append(copy.deepcopy(wpose))
+
+
+    plot(wpose.position.x,wpose.position.y,wpose.position.z)
+
+
 
     (plan, fraction) = group.compute_cartesian_path(
                                    waypoints,   # waypoints to follow

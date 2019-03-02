@@ -18,7 +18,11 @@ def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %.2f", data.data)
     move_2_starting_configuration()
 
+    plan, fraction = plan_Cartesian_path(data)
+    display_trajectory(plan)
+    execute_plan(plan)
 
+    
 def move_2_starting_configuration():
     # defined in joints space as follows
     
@@ -43,10 +47,41 @@ def plan_Cartesian_path(data):
     waypoints.append(group.get_current_pose().pose)
     wpose = geometry_msgs.msg.Pose()
 
-    wpose.orientation.w = data.data
-    #  move forward
-    
+    waypoints = []
+    scale = data.data
+    wpose = group.get_current_pose().pose
+    wpose.position.z -= scale * 0.1  # First move up (z)
+    wpose.position.y += scale * 0.2  # and sideways (y)
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.1  # Second move forward/backwards in (x)
+    waypoints.append(copy.deepcopy(wpose))
 
+    wpose.position.y -= scale * 0.1  # Third move sideways (y)
+    waypoints.append(copy.deepcopy(wpose))
+
+    (plan, fraction) = group.compute_cartesian_path(
+                                   waypoints,   # waypoints to follow
+                                   0.01,        # eef_step
+                                   0.0)         # jump_threshold
+    return plan, fraction
+
+def display_trajectory(plan):
+
+    display_trajectory_publisher = rospy.Publisher('display_planned_path',
+                                                    moveit_msgs.msg.DisplayTrajectory,
+                                                    queue_size=20)
+    robot = moveit_commander.RobotCommander()
+
+    display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+    display_trajectory.trajectory_start = robot.get_current_state()
+    display_trajectory.trajectory.append(plan)
+    # Publish
+    display_trajectory_publisher.publish(display_trajectory)
+
+def execute_plan(plan):
+    group_name = "panda_arm"
+    move_group = moveit_commander.MoveGroupCommander(group_name)
+    move_group.execute(plan, wait=True)
 
 def listener():
     
